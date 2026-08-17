@@ -1,8 +1,8 @@
-# AGENTS.md — Data Copilot MVP
+# AGENTS.md — DataFriend MVP
 
 ## Objetivo
 
-Construir um MVP de um **Data Copilot** capaz de:
+Construir um MVP de um **DataFriend** capaz de:
 
 1. Receber CSV ou XLSX.
 2. Carregar o dataset no DuckDB.
@@ -93,7 +93,7 @@ Não implementar ainda:
 ## Estrutura
 
 ```text
-data-copilot/
+DataFriend/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py
@@ -525,7 +525,7 @@ LLM_MODEL=
 CORS_ORIGINS=http://localhost:5173
 
 UPLOAD_DIR=./uploads
-DUCKDB_PATH=./data/copilot.duckdb
+DUCKDB_PATH=./data/datafriend.duckdb
 ```
 
 Nunca versionar:

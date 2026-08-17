@@ -1,6 +1,6 @@
-# Data Copilot MVP
+# DataFriend MVP
 
-O **Data Copilot** é uma ferramenta de inteligência de dados que permite aos usuários carregar arquivos estruturados (CSV/XLSX) e realizar consultas em linguagem natural. A aplicação gera SQL dinâmico e seguro para execução local no DuckDB e retorna respostas detalhadas geradas por IA.
+O **DataFriend** é uma ferramenta de inteligência de dados que permite aos usuários carregar arquivos estruturados (CSV/XLSX) e realizar consultas em linguagem natural. A aplicação gera SQL dinâmico e seguro para execução local no DuckDB e retorna respostas detalhadas geradas por IA.
 
 ---
 
@@ -35,7 +35,7 @@ Usuário → React Frontend → FastAPI Backend → Orchestrator → LLM (Gera S
 ## 🗂️ Estrutura do Projeto
 
 ```text
-data-copilot/
+DataFriend/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py                # Entrada do servidor FastAPI e CORS

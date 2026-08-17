@@ -1,1 +1,1 @@
-# Data Copilot Backend Application Package
+# DataFriend Backend Application Package

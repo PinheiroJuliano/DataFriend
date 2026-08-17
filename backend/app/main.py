@@ -17,8 +17,8 @@ class Settings(BaseSettings):
 settings = Settings()
 
 app = FastAPI(
-    title="Data Copilot API",
-    description="Backend API para o MVP do Data Copilot",
+    title="DataFriend API",
+    description="Backend API para o MVP do DataFriend",
     version="0.1.0"
 )
 
