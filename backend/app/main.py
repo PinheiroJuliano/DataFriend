@@ -1,20 +1,10 @@
-import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic_settings import BaseSettings
 
+from app.config import settings
 from app.api.chat import router as chat_router
 from app.api.upload import router as upload_router
 from app.api.datasets import router as datasets_router
-
-class Settings(BaseSettings):
-    cors_origins: str = "http://localhost:5173"
-
-    class Config:
-        env_file = ".env"
-        extra = "ignore"
-
-settings = Settings()
 
 app = FastAPI(
     title="DataFriend API",
