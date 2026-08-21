@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     llm_provider: str = "anthropic"
     llm_api_key: str = ""
     llm_model: str = ""
+    llm_fallback_provider: str = ""
+    llm_fallback_api_key: str = ""
+    llm_fallback_model: str = ""
 
     class Config:
         env_file = str(Path(__file__).resolve().parent.parent.parent / ".env")

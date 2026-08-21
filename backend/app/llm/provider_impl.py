@@ -4,10 +4,10 @@ from app.llm.provider import LLMProvider
 
 
 class AnthropicProvider(LLMProvider):
-    def __init__(self):
+    def __init__(self, api_key: str, model: str = ""):
         from anthropic import Anthropic
-        self.client = Anthropic(api_key=settings.llm_api_key)
-        self.model = settings.llm_model or "claude-3-5-sonnet-20241022"
+        self.client = Anthropic(api_key=api_key)
+        self.model = model or "claude-3-5-sonnet-20241022"
 
     async def generate_sql(self, question: str, schema: str) -> str:
         from app.agent.prompts import sql_prompt
@@ -31,10 +31,10 @@ class AnthropicProvider(LLMProvider):
 
 
 class GeminiProvider(LLMProvider):
-    def __init__(self):
+    def __init__(self, api_key: str, model: str = ""):
         from google import genai
-        self.client = genai.Client(api_key=settings.llm_api_key)
-        self.model = settings.llm_model or "gemini-2.0-flash"
+        self.client = genai.Client(api_key=api_key)
+        self.model = model or "gemini-3.6-flash"
 
     async def generate_sql(self, question: str, schema: str) -> str:
         from app.agent.prompts import sql_prompt
@@ -55,9 +55,56 @@ class GeminiProvider(LLMProvider):
         return response.text
 
 
+class FallbackLLMProvider(LLMProvider):
+    def __init__(self, primary: LLMProvider, fallback: LLMProvider):
+        self.primary = primary
+        self.fallback = fallback
+
+    async def generate_sql(self, question: str, schema: str) -> str:
+        try:
+            return await self.primary.generate_sql(question=question, schema=schema)
+        except Exception:
+            return await self.fallback.generate_sql(question=question, schema=schema)
+
+    async def explain_result(self, question: str, sql: str, result: str) -> str:
+        try:
+            return await self.primary.explain_result(
+                question=question,
+                sql=sql,
+                result=result,
+            )
+        except Exception:
+            return await self.fallback.explain_result(
+                question=question,
+                sql=sql,
+                result=result,
+            )
+
+
+def _build_provider(provider: str, api_key: str, model: str) -> LLMProvider:
+    if provider == "anthropic":
+        return AnthropicProvider(api_key=api_key, model=model)
+    if provider == "gemini":
+        return GeminiProvider(api_key=api_key, model=model)
+    raise ValueError(f"Provider não suportado: {provider}")
+
+
 def get_llm_provider() -> LLMProvider:
-    if settings.llm_provider == "anthropic":
-        return AnthropicProvider()
-    if settings.llm_provider == "gemini":
-        return GeminiProvider()
-    raise ValueError(f"Provider não suportado: {settings.llm_provider}")
+    primary = _build_provider(
+        provider=settings.llm_provider,
+        api_key=settings.llm_api_key,
+        model=settings.llm_model,
+    )
+
+    if not settings.llm_fallback_provider:
+        return primary
+
+    if not settings.llm_fallback_api_key:
+        raise ValueError("LLM_FALLBACK_API_KEY é obrigatória quando o fallback está configurado")
+
+    fallback = _build_provider(
+        provider=settings.llm_fallback_provider,
+        api_key=settings.llm_fallback_api_key,
+        model=settings.llm_fallback_model,
+    )
+    return FallbackLLMProvider(primary=primary, fallback=fallback)

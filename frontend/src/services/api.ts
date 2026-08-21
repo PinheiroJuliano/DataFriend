@@ -1,6 +1,6 @@
 import type { DatasetMetadata, ChatResponse, ChatRequest } from '../types'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001'
 
 export async function uploadDataset(file: File): Promise<DatasetMetadata> {
   const form = new FormData()
