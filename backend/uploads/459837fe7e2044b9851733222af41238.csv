@@ -1,0 +1,6 @@
+id,data,produto,categoria,estado,quantidade,valor
+1,2025-01-10,Notebook,Eletronicos,SP,2,8000
+2,2025-01-12,Mouse,Perifericos,MG,10,1500
+3,2025-02-03,Notebook,Eletronicos,MG,1,4000
+4,2025-02-15,Monitor,Eletronicos,SP,4,6000
+5,2025-03-01,Mouse,Perifericos,RJ,20,3000
