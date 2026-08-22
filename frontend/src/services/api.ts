@@ -39,3 +39,48 @@ export async function sendQuestion(data: ChatRequest): Promise<ChatResponse> {
 
   return res.json()
 }
+
+export async function connectURL(url: string, name?: string, headers?: Record<string, string>): Promise<DatasetMetadata> {
+  const res = await fetch(`${API_URL}/api/datasets/connect/url`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, name, headers }),
+  })
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Erro ao conectar na API' }))
+    throw new Error(err.detail || 'Erro ao conectar na API')
+  }
+
+  return res.json()
+}
+
+export async function connectDB(connection_string: string, query: string, name?: string): Promise<DatasetMetadata> {
+  const res = await fetch(`${API_URL}/api/datasets/connect/db`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ connection_string, query, name }),
+  })
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Erro ao conectar no banco' }))
+    throw new Error(err.detail || 'Erro ao conectar no banco')
+  }
+
+  return res.json()
+}
+
+export async function connectKaggle(dataset: string, file_path: string, name?: string): Promise<DatasetMetadata> {
+  const res = await fetch(`${API_URL}/api/datasets/kaggle`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dataset, file_path, name }),
+  })
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Erro ao carregar do Kaggle' }))
+    throw new Error(err.detail || 'Erro ao carregar do Kaggle')
+  }
+
+  return res.json()
+}

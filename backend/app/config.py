@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     llm_fallback_provider: str = ""
     llm_fallback_api_key: str = ""
     llm_fallback_model: str = ""
+    kaggle_username: str = ""
+    kaggle_key: str = ""
 
     class Config:
         env_file = str(Path(__file__).resolve().parent.parent.parent / ".env")

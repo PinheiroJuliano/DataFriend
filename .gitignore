@@ -35,3 +35,4 @@ data/*
 Thumbs.db
 Desktop.ini
 .DS_Store
+.csv

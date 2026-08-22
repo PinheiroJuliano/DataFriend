@@ -92,13 +92,21 @@ class TestSQLValidatorBlocks:
             validate_sql("EXPLAIN SELECT * FROM data")
 
     def test_other_table_from(self):
-        with pytest.raises(ValueError, match="tabela 'other_table'"):
+        with pytest.raises(ValueError, match="other_table"):
             validate_sql("SELECT * FROM other_table")
 
     def test_other_table_join(self):
-        with pytest.raises(ValueError, match="tabela 'users'"):
+        with pytest.raises(ValueError, match="users"):
             validate_sql("SELECT * FROM data JOIN users ON data.id = users.id")
 
     def test_other_table_into(self):
-        with pytest.raises(ValueError, match="tabela 'backup'"):
+        with pytest.raises(ValueError, match="backup"):
             validate_sql("SELECT * INTO backup FROM data")
+
+    def test_subquery_allowed(self):
+        result = validate_sql("SELECT * FROM (SELECT id FROM data) sub")
+        assert "SELECT" in result
+
+    def test_cte_with_subquery(self):
+        result = validate_sql("WITH cte AS (SELECT id FROM data) SELECT * FROM cte")
+        assert "SELECT" in result

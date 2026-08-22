@@ -18,6 +18,8 @@ BLOCKED_KEYWORDS: Set[str] = {
     "PRAGMA",
 }
 
+KNOWN_TABLES: Set[str] = {"DATA"}
+
 
 def _strip_markdown(sql: str) -> str:
     sql = sql.strip()
@@ -30,6 +32,35 @@ def _normalize(sql: str) -> str:
     sql = _strip_markdown(sql)
     sql = sql.rstrip(";").strip()
     return sql
+
+
+def _remove_subqueries(sql_upper: str) -> str:
+    """Remove subqueries and their aliases to avoid false positives on inner table refs."""
+    result = sql_upper
+    depth = 0
+    start = -1
+    chars = list(result)
+    for i, c in enumerate(chars):
+        if c == '(':
+            if depth == 0:
+                start = i
+            depth += 1
+        elif c == ')':
+            depth -= 1
+            if depth == 0 and start >= 0:
+                # Remove from ( to ) inclusive
+                for j in range(start, i + 1):
+                    chars[j] = ' '
+                # Also remove the alias after ) if present
+                k = i + 1
+                while k < len(chars) and chars[k] == ' ':
+                    k += 1
+                if k < len(chars) and chars[k].isalpha():
+                    while k < len(chars) and (chars[k].isalnum() or chars[k] == '_'):
+                        chars[k] = ' '
+                        k += 1
+                start = -1
+    return ''.join(chars)
 
 
 def validate_sql(sql: str) -> str:
@@ -71,15 +102,20 @@ def validate_sql(sql: str) -> str:
     for match in re.finditer(r"\bWITH\b\s+(\w+)\s+AS\s*\(", upper):
         cte_aliases.add(match.group(1))
 
+    # Remove subqueries before checking table references
+    cleaned = _remove_subqueries(upper)
+
     # Block access to tables other than 'data' or CTE aliases
     table_refs = re.findall(
         r"\b(?:FROM|JOIN|INTO|TABLE)\s+([a-zA-Z_]\w*)",
-        upper,
+        cleaned,
     )
+    allowed = KNOWN_TABLES | cte_aliases
     for table in table_refs:
-        if table != "DATA" and table not in cte_aliases:
+        if table not in allowed:
             raise ValueError(
-                f"Acesso à tabela '{table.lower()}' não é permitido. Use apenas a tabela 'data'."
+                f"Tabela '{table.lower()}' não existe. Use apenas a tabela 'data'. "
+                f"Colunas disponíveis estão no schema."
             )
 
     return sql
